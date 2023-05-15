@@ -4,6 +4,8 @@ function Form (props) {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [phoneType, setPhoneType] = useState('');
+
     const [errorMessages, setErrorMessages] = useState([]);
 
     const validates = () => {
@@ -24,16 +26,23 @@ function Form (props) {
         }
 
         // validate phone number
-        let phoneNumberParts = phoneNumber.split('-');
-        if (phoneNumberParts.length !==3 || phoneNumberParts[0].length !== 3 || phoneNumberParts[1].length !== 3 || phoneNumberParts[2].length !== 4) {
-            errors.push("Invalid format: Phone number must be in xxx-xxx-xxxx format")
-        }
-        const nums = '0123456789-'
-        for(let digit of phoneNumber) {
-            if (!nums.includes(digit)) {
-                errors.push("Phone number can only contain valid numbers and dashes");
-                break;
+        if(phoneNumber){
+            let phoneNumberParts = phoneNumber.split('-');
+            if (phoneNumberParts.length !==3 || phoneNumberParts[0].length !== 3 || phoneNumberParts[1].length !== 3 || phoneNumberParts[2].length !== 4) {
+                errors.push("Invalid format: Phone number must be in xxx-xxx-xxxx format")
             }
+            const nums = '0123456789-'
+            for(let digit of phoneNumber) {
+                if (!nums.includes(digit)) {
+                    errors.push("Phone number can only contain valid numbers and dashes");
+                    break;
+                }
+            }
+        }
+
+        // require phone type if phone number
+        if(phoneNumber && !phoneType){
+            errors.push("Must select a phone type for the entered phone number");
         }
 
 
@@ -53,6 +62,10 @@ function Form (props) {
                 case "phoneNumber":
                     setPhoneNumber(e.target.value);
                     break;
+                case "phoneType":
+                    console.log(e.target.value);
+                    setPhoneType(e.target.value);
+                    break;
             }
         }
     }
@@ -68,7 +81,8 @@ function Form (props) {
             let user = {
                 name: name,
                 email: email,
-                phoneNumber
+                phoneNumber,
+                phoneType
             };
             console.log(user);
         }
@@ -100,7 +114,18 @@ function Form (props) {
                 </label>
                 <br />
                 <label>Phone Number
-                    <input type="text" placeholder="xxx-xxx-xxxx" value={phoneNumber} onChange={handleChange("phoneNumber")}/>
+                    <input type="text" placeholder="xxx-xxx-xxxx (optional)" value={phoneNumber} onChange={handleChange("phoneNumber")}/>
+                </label>
+                <br />
+                <label>Phone Type
+                    {/* <select name="phoneType" {(phoneNumber) ? "" : disabled} onChange={handleChange("phoneType")}> */}
+                    <select name="phoneType" disabled={phoneNumber ? false : true} onChange={handleChange("phoneType")}>
+                        <option value="" selected>-- Please select an option --</option>
+                        <option>Cell Phone</option> (/* without a value will use display text as value */)
+                        <option value="Home Phone">Home Phone</option>
+                        <option value="Work Phone">Work Phone</option>
+                    </select>
+                    
                 </label>
                 <br />
                 <button>Submit</button>
